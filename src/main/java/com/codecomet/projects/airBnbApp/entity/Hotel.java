@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -29,12 +30,12 @@ public class Hotel {
     @Lob
     @Column(name = "photos", columnDefinition = "CLOB")
     @Convert(converter = StringListConverter.class)
-    private List<String> photos;
+    private Set<String> photos;
 
     @Lob
     @Column(name = "amenities", columnDefinition = "CLOB")
     @Convert(converter = StringListConverter.class)
-    private List<String> amenities;
+    private Set<String> amenities;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -47,6 +48,13 @@ public class Hotel {
 
     @Column(nullable = false)
     private Boolean active;
+
+    @ManyToOne
+    private User owner;
+
+    @OneToMany(mappedBy = "hotel")
+    private List<Room> rooms;
+
 
 
 }

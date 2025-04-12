@@ -10,7 +10,7 @@ import lombok.Setter;
 public class HotelContactInfo {
 
     private String address;
-    private Integer phoneNumber;
+    private Long phoneNumber;
     private String email;
     private String location;
 

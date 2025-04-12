@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -22,7 +23,7 @@ public class Room {
     @SequenceGenerator(name = "room_seq", sequenceName = "generic_seq", allocationSize = 1)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id",nullable = false)
     private Hotel hotel;
 
@@ -35,12 +36,12 @@ public class Room {
     @Lob
     @Column(name = "photos", columnDefinition = "CLOB")
     @Convert(converter = StringListConverter.class)
-    private List<String> photos;
+    private Set<String> photos;
 
     @Lob
     @Column(name = "amenities", columnDefinition = "CLOB")
     @Convert(converter = StringListConverter.class)
-    private List<String> amenities;
+    private Set<String> amenities;
 
     @Column(nullable = false)
     private Integer totalCount;

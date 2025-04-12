@@ -5,17 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Converter
-public class StringListConverter implements AttributeConverter<List<String>, String> {
+public class StringListConverter implements AttributeConverter<Set<String>, String> {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public String convertToDatabaseColumn(List<String> attribute) {
+    public String convertToDatabaseColumn(Set<String> attribute) {
         try {
             return mapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
@@ -24,10 +22,11 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
     }
 
     @Override
-    public List<String> convertToEntityAttribute(String dbData) {
+    public Set<String> convertToEntityAttribute(String dbData) {
         try {
-            if (dbData == null) return Collections.emptyList();
-            return Arrays.asList(mapper.readValue(dbData, String[].class));
+            if (dbData == null) return Collections.emptySet();
+            String[] values=mapper.readValue(dbData, String[].class);
+            return new HashSet<>(Arrays.asList(values));
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Could not convert JSON to list", e);
         }
