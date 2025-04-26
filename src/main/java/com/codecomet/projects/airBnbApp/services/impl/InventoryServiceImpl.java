@@ -1,10 +1,12 @@
 package com.codecomet.projects.airBnbApp.services.impl;
 
 import com.codecomet.projects.airBnbApp.dto.HotelDto;
+import com.codecomet.projects.airBnbApp.dto.HotelPriceDto;
 import com.codecomet.projects.airBnbApp.dto.HotelSearchRequest;
 import com.codecomet.projects.airBnbApp.entity.Hotel;
 import com.codecomet.projects.airBnbApp.entity.Inventory;
 import com.codecomet.projects.airBnbApp.entity.Room;
+import com.codecomet.projects.airBnbApp.repositories.HotelMinPriceRepository;
 import com.codecomet.projects.airBnbApp.repositories.InventoryRepository;
 import com.codecomet.projects.airBnbApp.services.InventoryService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
     private final ModelMapper modelMapper;
+    private final HotelMinPriceRepository hotelMinPriceRepository;
 
     @Override
     public void initializeRoomForAYear(Room room) {
@@ -61,20 +64,29 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public Page<HotelDto> searchHotels(HotelSearchRequest hotelSearchRequest) {
+    public Page<HotelPriceDto> searchHotels(HotelSearchRequest hotelSearchRequest) {
 
         log.info("Searching hotels for {} city, from {} to {}",hotelSearchRequest.getCity(),hotelSearchRequest.getStartDate(),hotelSearchRequest.getEndDate());
 
         Pageable pageable= PageRequest.of(hotelSearchRequest.getPage(),hotelSearchRequest.getSize());
         Long dateCount = ChronoUnit.DAYS.between(hotelSearchRequest.getStartDate(),hotelSearchRequest.getEndDate()) + 1;
 
-        List<Hotel> hotels =  inventoryRepository.findHotelsWithAvailableInventory(hotelSearchRequest.getCity(),hotelSearchRequest.getStartDate()
+
+//        if(dateCount >90){
+//            List<Hotel> hotels =  inventoryRepository.findHotelsWithAvailableInventory(hotelSearchRequest.getCity(),hotelSearchRequest.getStartDate()
+//               ,hotelSearchRequest.getEndDate(),hotelSearchRequest.getRoomsCount(),dateCount);
+//
+//            List<HotelDto> hotelDtos = hotels.stream()
+//                    .map(h -> modelMapper.map(h, HotelDto.class))
+//                    .collect(Collectors.toList());
+//
+//        }
+
+
+        List<HotelPriceDto> hotels =  hotelMinPriceRepository.findHotelsWithAvailableInventory(hotelSearchRequest.getCity(),hotelSearchRequest.getStartDate()
                 ,hotelSearchRequest.getEndDate(),hotelSearchRequest.getRoomsCount(),dateCount);
 
-        List<HotelDto> hotelDtos = hotels.stream()
-                .map(h -> modelMapper.map(h, HotelDto.class))
-                .collect(Collectors.toList());
 
-        return new PageImpl<>(hotelDtos, pageable, hotelDtos.size());
+        return new PageImpl<>(hotels, pageable, hotels.size());
     }
 }

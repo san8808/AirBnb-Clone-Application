@@ -16,8 +16,7 @@ import java.util.Set;
 public class Guest {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "booking_seq")
-    @SequenceGenerator(name = "booking_seq", sequenceName = "generic_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @ManyToOne

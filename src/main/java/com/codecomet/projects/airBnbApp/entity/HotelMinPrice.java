@@ -1,15 +1,16 @@
 package com.codecomet.projects.airBnbApp.entity;
 
 import com.codecomet.projects.airBnbApp.util.StringListConverter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -17,7 +18,15 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-public class Room {
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "hotel_min_price")
+public class HotelMinPrice {
+
+    public HotelMinPrice(Hotel hotel, BigDecimal price) {
+        this.hotel = hotel;
+        this.price = price;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -27,31 +36,16 @@ public class Room {
     @JoinColumn(name = "hotel_id",nullable = false)
     private Hotel hotel;
 
-    @Column(nullable = false)
-    private String type;
+    @Column(name = "\"date\"",nullable = false)
+    private LocalDate date;
 
     @Column(nullable = false,precision = 10,scale = 2)
-    private BigDecimal basePrice;
-
-    @Column(columnDefinition = "TEXT[]")
-    private String[] photos;
-
-    @Column(columnDefinition = "TEXT[]")
-    private String[] amenities;
-
-    @Column(nullable = false)
-    private Integer totalCount;
-
-    @Column(nullable = false)
-    private Integer capacity;
+    private BigDecimal price;  // cheapest room price available for that hotel
 
     @CreationTimestamp
-    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-
 
 }

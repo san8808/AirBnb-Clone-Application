@@ -1,6 +1,7 @@
 package com.codecomet.projects.airBnbApp.entity;
 
 import com.codecomet.projects.airBnbApp.util.StringListConverter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,8 +19,7 @@ import java.util.Set;
 public class Hotel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "hotel_seq")
-    @SequenceGenerator(name = "hotel_seq", sequenceName = "generic_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(nullable = false)
@@ -27,15 +27,11 @@ public class Hotel {
 
     private String city;
 
-    @Lob
-    @Column(name = "photos", columnDefinition = "CLOB")
-    @Convert(converter = StringListConverter.class)
-    private Set<String> photos;
+    @Column(columnDefinition = "TEXT[]")
+    private String[] photos;
 
-    @Lob
-    @Column(name = "amenities", columnDefinition = "CLOB")
-    @Convert(converter = StringListConverter.class)
-    private Set<String> amenities;
+    @Column(columnDefinition = "TEXT[]")
+    private String[] amenities;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -53,6 +49,7 @@ public class Hotel {
     private User owner;
 
     @OneToMany(mappedBy = "hotel")
+    @JsonIgnore
     private List<Room> rooms;
 
 

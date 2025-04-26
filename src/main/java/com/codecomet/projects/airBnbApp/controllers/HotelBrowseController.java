@@ -2,6 +2,7 @@ package com.codecomet.projects.airBnbApp.controllers;
 
 import com.codecomet.projects.airBnbApp.dto.HotelDto;
 import com.codecomet.projects.airBnbApp.dto.HotelInfoDto;
+import com.codecomet.projects.airBnbApp.dto.HotelPriceDto;
 import com.codecomet.projects.airBnbApp.dto.HotelSearchRequest;
 import com.codecomet.projects.airBnbApp.services.HotelService;
 import com.codecomet.projects.airBnbApp.services.InventoryService;
@@ -22,8 +23,8 @@ public class HotelBrowseController {
     private final HotelService hotelService;
 
     @GetMapping("/search")
-    public ResponseEntity<Page<HotelDto>> searchHotels(@RequestBody HotelSearchRequest hotelSearchRequest){
-        Page<HotelDto> page = inventoryService.searchHotels(hotelSearchRequest);
+    public ResponseEntity<Page<HotelPriceDto>> searchHotels(@RequestBody HotelSearchRequest hotelSearchRequest){
+        Page<HotelPriceDto> page = inventoryService.searchHotels(hotelSearchRequest);
         return ResponseEntity.ok(page);
     }
 
