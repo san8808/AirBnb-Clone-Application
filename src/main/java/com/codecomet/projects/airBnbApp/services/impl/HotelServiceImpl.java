@@ -5,7 +5,9 @@ import com.codecomet.projects.airBnbApp.dto.HotelInfoDto;
 import com.codecomet.projects.airBnbApp.dto.RoomDto;
 import com.codecomet.projects.airBnbApp.entity.Hotel;
 import com.codecomet.projects.airBnbApp.entity.Room;
+import com.codecomet.projects.airBnbApp.entity.User;
 import com.codecomet.projects.airBnbApp.exception.ResourceNotFoundException;
+import com.codecomet.projects.airBnbApp.exception.UnAuthorizedException;
 import com.codecomet.projects.airBnbApp.repositories.HotelRepository;
 import com.codecomet.projects.airBnbApp.repositories.RoomRepository;
 import com.codecomet.projects.airBnbApp.services.HotelService;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +40,10 @@ public class HotelServiceImpl implements HotelService {
         log.info("Creating a new hotel with name: {}", hotelDto.getName());
         Hotel hotel= modelMapper.map(hotelDto,Hotel.class);
         hotel.setActive(false);
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        hotel.setOwner(user);
+
         hotel = hotelRepository.save(hotel);
         log.info("Created a hotel with id: {}", hotelDto.getId());
         return modelMapper.map(hotel,HotelDto.class);
@@ -47,6 +54,11 @@ public class HotelServiceImpl implements HotelService {
         log.info("Getting hotel by id: {}", hotelId);
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+hotelId));
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(hotel.getOwner())){
+            throw new UnAuthorizedException("User does not own this hotel with id: "+hotelId);
+        }
         return modelMapper.map(hotel,HotelDto.class);
     }
 
@@ -55,6 +67,11 @@ public class HotelServiceImpl implements HotelService {
         log.info("Updating the hotel with ID: {}",hotelId);
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+hotelId));
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(hotel.getOwner())){
+            throw new UnAuthorizedException("User does not own this hotel with id: "+hotelId);
+        }
 
         modelMapper.map(hotelDto,hotel);
         hotel.setId(hotelId);
@@ -69,6 +86,11 @@ public class HotelServiceImpl implements HotelService {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+id));
         hotel.setActive(true);
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(hotel.getOwner())){
+            throw new UnAuthorizedException("User does not own this hotel with id: "+id);
+        }
 
         /*deleting all inventory room details for the deleted hotel*/
         for(Room room: hotel.getRooms()){
@@ -85,6 +107,12 @@ public class HotelServiceImpl implements HotelService {
         log.info("Activating the hotel with ID: {}",hotelId);
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+hotelId));
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(hotel.getOwner())){
+            throw new UnAuthorizedException("User does not own this hotel with id: "+hotelId);
+        }
+
         hotel.setActive(true);
         hotelRepository.save(hotel);
 
@@ -96,6 +124,7 @@ public class HotelServiceImpl implements HotelService {
 
     }
 
+    //public route
     @Override
     public HotelInfoDto getHotelInfoById(Long hotelId) {
 
