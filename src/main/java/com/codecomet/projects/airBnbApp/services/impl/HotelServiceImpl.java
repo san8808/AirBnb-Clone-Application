@@ -13,6 +13,7 @@ import com.codecomet.projects.airBnbApp.repositories.RoomRepository;
 import com.codecomet.projects.airBnbApp.services.HotelService;
 import com.codecomet.projects.airBnbApp.services.InventoryService;
 import com.codecomet.projects.airBnbApp.services.RoomService;
+import com.codecomet.projects.airBnbApp.util.AppUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.codecomet.projects.airBnbApp.util.AppUtils.getCurrentUser;
 
 
 @Service
@@ -141,5 +144,13 @@ public class HotelServiceImpl implements HotelService {
         hotelInfoDto.setRooms(rooms);
 
         return hotelInfoDto;
+    }
+
+    @Override
+    public List<HotelDto> getAllHotels() {
+        User user = getCurrentUser();
+        log.info("Getting all hotels for the user with id: {} and name: {}", user.getId(), user.getName());
+        List<Hotel> hotels = hotelRepository.findByOwner(user);
+        return hotels.stream().map((element) -> modelMapper.map(element,HotelDto.class)).collect(Collectors.toList());
     }
 }
